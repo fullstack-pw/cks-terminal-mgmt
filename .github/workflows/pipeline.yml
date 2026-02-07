@@ -1,0 +1,74 @@
+name: App CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  docker-build-and-push:
+    name: Build and Push
+    uses: fullstack-pw/pipelines/.github/workflows/build-and-push.yml@main
+    with:
+      app-context: "."
+      app-name: "cks-terminal-mgmt"
+      app-dockerfile: "Dockerfile"
+
+  update-sandboxy-kustomization:
+    needs: [docker-build-and-push]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: self-hosted
+    name: Deploy cks-terminal-mgmt to sandboxy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RUNNER }}
+          fetch-depth: 0
+
+      - name: Update sandboxy kustomization with new image tag
+        run: |
+          VERSION="${{ github.sha }}"
+          KUSTOMIZATION_FILE="kustomize/overlays/sandboxy/kustomization.yaml"
+
+          if [ ! -f "$KUSTOMIZATION_FILE" ]; then
+            echo "Warning: $KUSTOMIZATION_FILE not found, skipping"
+            exit 0
+          fi
+
+          echo "Updating cks-terminal-mgmt sandboxy to version: $VERSION"
+          sed -i "s/newTag: .*/newTag: $VERSION/" "$KUSTOMIZATION_FILE"
+
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add "$KUSTOMIZATION_FILE"
+          git commit -m "chore(cks-terminal-mgmt): deploy $VERSION to sandboxy [skip ci]" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+
+  versioning:
+    permissions:
+      contents: write
+    runs-on: self-hosted
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Versioning
+    steps:
+      - name: Get Next Version
+        id: semver
+        uses: ietf-tools/semver-action@v1
+        with:
+          token: ${{ github.token }}
+          branch: main
+          patchList: fix, bugfix, perf, refactor, test, tests, chore
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          tag: ${{ steps.semver.outputs.next }}
+          body: Changelog Contents
+          token: ${{ github.token }}

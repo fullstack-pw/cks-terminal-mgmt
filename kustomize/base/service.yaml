@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cks-terminal-mgmt
+spec:
+  selector:
+    app: cks-terminal-mgmt
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP

@@ -1,0 +1,6 @@
+cks-terminal-mgmt
+server
+*.exe
+*.test
+*.out
+.env
