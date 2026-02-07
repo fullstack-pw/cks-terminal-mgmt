@@ -1,5 +1,5 @@
 cks-terminal-mgmt
-server
+/server
 *.exe
 *.test
 *.out
