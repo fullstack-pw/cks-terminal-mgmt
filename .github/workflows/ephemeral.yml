@@ -249,3 +249,28 @@ jobs:
           kubectl delete cluster "$CLUSTER_NAME" -n "$CLUSTER_NAME" --context tools --kubeconfig /home/runner/.kube/config || true
 
           ./clusters/scripts/ip_pool_manager.sh release "$CLUSTER_NAME" || true
+
+  cypress-tests:
+    needs: manage-environment
+    if: github.event.action != 'closed' && needs.manage-environment.outputs.deployment_status == 'success'
+    runs-on: self-hosted
+    container:
+      image: cypress/included:13.6.4
+    steps:
+      - name: Checkout demo-apps repository
+        uses: actions/checkout@v4
+        with:
+          repository: fullstack-pw/demo-apps
+          path: .
+
+      - name: Run Cypress tests
+        id: cypress
+        continue-on-error: true
+        uses: cypress-io/github-action@v6
+        with:
+          spec: cypress/e2e/cks-terminal-mgmt.cy.js
+          config: baseUrl=https://${{ needs.manage-environment.outputs.dns_name }}
+          env: CKS_TERMINAL_MGMT_URL=https://${{ needs.manage-environment.outputs.dns_name }},TEST_ENV=ephemeral
+          browser: chrome
+          install-command: npm ci
+          summary-title: Cypress Test Results
