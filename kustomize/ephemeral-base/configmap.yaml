@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cks-terminal-mgmt-config
+data:
+  ENVIRONMENT: "ephemeral"
+  LOG_LEVEL: "DEBUG"

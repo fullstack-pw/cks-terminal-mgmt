@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: cks-terminal-mgmt
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  hosts:
+    - "terminal.cks.fullstack.pw"
+  gateways:
+    - istio-system/default-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: cks-terminal-mgmt.default.svc.cluster.local
+            port:
+              number: 8080
+      timeout: 300s
