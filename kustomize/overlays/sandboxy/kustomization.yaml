@@ -2,11 +2,26 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../base
+  - ../../ephemeral-base
 
 images:
   - name: registry.fullstack.pw/library/cks-terminal-mgmt
     newTag: 4812b36a6501a64bd161e77d7cf56570a6d6f777
+
+patches:
+  - target:
+      kind: Ingress
+      name: cks-terminal-mgmt
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: terminal.cks.fullstack.pw
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: terminal.cks.fullstack.pw
+      - op: replace
+        path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
+        value: terminal.cks.fullstack.pw
 
 configMapGenerator:
   - name: cks-terminal-mgmt-config
