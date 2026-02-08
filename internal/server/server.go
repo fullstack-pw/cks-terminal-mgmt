@@ -29,6 +29,7 @@ func New(cfg *config.Config) *Server {
 func (s *Server) routes() {
 	s.mux.HandleFunc("/health", s.handleHealth)
 	s.mux.HandleFunc("/terminal", s.manager.HandleTerminal)
+	s.mux.HandleFunc("/s/", s.manager.HandleSession)
 	s.mux.Handle("/metrics", promhttp.Handler())
 }
 

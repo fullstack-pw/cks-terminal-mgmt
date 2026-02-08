@@ -9,6 +9,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os/exec"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -66,25 +68,52 @@ func (m *Manager) HandleTerminal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.Redirect(w, r, fmt.Sprintf("/s/%d/", port), http.StatusFound)
+}
+
+func (m *Manager) HandleSession(w http.ResponseWriter, r *http.Request) {
+	parts := strings.SplitN(strings.TrimPrefix(r.URL.Path, "/s/"), "/", 2)
+	if len(parts) == 0 {
+		http.Error(w, "invalid session path", http.StatusBadRequest)
+		return
+	}
+
+	port, err := strconv.Atoi(parts[0])
+	if err != nil {
+		http.Error(w, "invalid session id", http.StatusBadRequest)
+		return
+	}
+
+	m.mu.Lock()
+	_, exists := m.sessions[port]
+	m.mu.Unlock()
+
+	if !exists {
+		http.Error(w, "session not found", http.StatusNotFound)
+		return
+	}
+
 	target, _ := url.Parse(fmt.Sprintf("http://127.0.0.1:%d", port))
+
+	if isWebSocketUpgrade(r) {
+		wsTarget, _ := url.Parse(fmt.Sprintf("http://127.0.0.1:%d%s", port, r.URL.Path))
+		m.proxyWebSocket(w, r, wsTarget)
+		return
+	}
+
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
 	proxy.Director = func(req *http.Request) {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
 		req.URL.Path = r.URL.Path
-		req.URL.RawQuery = ""
+		req.URL.RawQuery = r.URL.RawQuery
 		req.Host = target.Host
 	}
 
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		resp.Header.Del("X-Frame-Options")
 		return nil
-	}
-
-	if isWebSocketUpgrade(r) {
-		m.proxyWebSocket(w, r, target)
-		return
 	}
 
 	proxy.ServeHTTP(w, r)
@@ -98,6 +127,7 @@ func (m *Manager) spawnTTYD(vmIP string) (int, error) {
 		"--port", fmt.Sprintf("%d", port),
 		"--once",
 		"--interface", "127.0.0.1",
+		"--base-path", fmt.Sprintf("/s/%d", port),
 		"ssh",
 		"-o", "StrictHostKeyChecking=no",
 		"-o", "UserKnownHostsFile=/dev/null",
@@ -218,8 +248,8 @@ func (m *Manager) proxyWebSocket(w http.ResponseWriter, r *http.Request, target 
 	proxyReq := r.Clone(r.Context())
 	proxyReq.URL.Scheme = "ws"
 	proxyReq.URL.Host = targetAddr
-	proxyReq.URL.Path = r.URL.Path
-	proxyReq.URL.RawQuery = ""
+	proxyReq.URL.Path = target.Path
+	proxyReq.URL.RawQuery = r.URL.RawQuery
 	proxyReq.Host = targetAddr
 	proxyReq.RequestURI = proxyReq.URL.RequestURI()
 
