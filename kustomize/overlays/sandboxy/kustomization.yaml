@@ -6,7 +6,7 @@ resources:
 
 images:
   - name: registry.fullstack.pw/library/cks-terminal-mgmt
-    newTag: latest
+    newTag: 4812b36a6501a64bd161e77d7cf56570a6d6f777
 
 configMapGenerator:
   - name: cks-terminal-mgmt-config
