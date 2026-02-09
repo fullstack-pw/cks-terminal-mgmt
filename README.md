@@ -18,8 +18,24 @@ The service runs on the sandboxy cluster alongside KubeVirt VMs, providing direc
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/health` | GET | Health check with active session count |
-| `/terminal?vmIP=10.244.x.x` | GET | Terminal connection (WebSocket upgrade) |
+| `/terminal?vmIP=<ip>` | GET | Spawns ttyd process for VM, redirects to session path |
+| `/s/<port>/` | GET/WS | Proxies requests to ttyd session (HTML, assets, WebSocket) |
 | `/metrics` | GET | Prometheus metrics |
+
+### Terminal Flow
+
+1. Client requests `GET /terminal?vmIP=10.42.0.56`
+2. Service spawns ttyd with `--base-path /s/<port>` and SSH to the VM
+3. Returns 302 redirect to `/s/<port>/`
+4. All subsequent requests (HTML, CSS, JS, WebSocket) under `/s/<port>/` are proxied to ttyd
+
+### ttyd Client Options
+
+Each spawned ttyd process includes:
+- `disableLeaveAlert=true` - no browser exit confirmation (iframe-friendly)
+- `disableResizeOverlay=true` - clean resize experience
+- `titleFixed=CKS Terminal` - consistent window title
+- `fontSize=14` - readable terminal font
 
 ## Development
 
