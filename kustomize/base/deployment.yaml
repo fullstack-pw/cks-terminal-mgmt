@@ -40,6 +40,7 @@ spec:
           image: registry.fullstack.pw/library/cks-terminal-mgmt:latest
           ports:
             - containerPort: 8080
+              protocol: TCP
           env:
             - name: SSH_KEY_PATH
               value: /home/appuser/.ssh/id_ed25519
