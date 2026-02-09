@@ -6,7 +6,7 @@ resources:
 
 images:
   - name: registry.fullstack.pw/library/cks-terminal-mgmt
-    newTag: 79477b84bfe725c4578c5c4b91d8ec3bbfe73192
+    newTag: 19aa6d1a3c61a83e6ab188fa66b93180bf35af24
 
 patches:
   - target:
