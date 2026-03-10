@@ -11,7 +11,7 @@ permissions:
 jobs:
   docker-build-and-push:
     name: Build and Push
-    uses: fullstack-pw/pipelines/.github/workflows/build-and-push.yml@main
+    uses: homelabz-eu/pipelines/.github/workflows/build-and-push.yml@main
     with:
       app-context: "."
       app-name: "cks-terminal-mgmt"

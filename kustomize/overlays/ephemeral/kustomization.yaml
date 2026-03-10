@@ -7,20 +7,20 @@ resources:
   - ../../ephemeral-base
 
 images:
-  - name: registry.toolz.fullstack.pw/library/cks-terminal-mgmt
+  - name: registry.toolz.homelabz.eu/library/cks-terminal-mgmt
     newTag: pr-will-be-replaced
 
 patches:
   - patch: |-
       - op: replace
         path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
-        value: "dev.terminal.cks.fullstack.pw"
+        value: "dev.terminal.cks.homelabz.eu"
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: "dev.terminal.cks.fullstack.pw"
+        value: "dev.terminal.cks.homelabz.eu"
       - op: replace
         path: /spec/rules/0/host
-        value: "dev.terminal.cks.fullstack.pw"
+        value: "dev.terminal.cks.homelabz.eu"
     target:
       kind: Ingress
       name: cks-terminal-mgmt

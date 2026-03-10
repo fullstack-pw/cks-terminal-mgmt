@@ -37,7 +37,7 @@ spec:
             runAsUser: 0
       containers:
         - name: cks-terminal-mgmt
-          image: registry.toolz.fullstack.pw/library/cks-terminal-mgmt:latest
+          image: registry.toolz.homelabz.eu/library/cks-terminal-mgmt:latest
           ports:
             - containerPort: 8080
               protocol: TCP

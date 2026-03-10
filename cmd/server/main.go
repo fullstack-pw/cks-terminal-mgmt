@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/fullstack-pw/cks-terminal-mgmt/internal/config"
-	"github.com/fullstack-pw/cks-terminal-mgmt/internal/server"
+	"github.com/homelabz-eu/cks-terminal-mgmt/internal/config"
+	"github.com/homelabz-eu/cks-terminal-mgmt/internal/server"
 )
 
 func main() {

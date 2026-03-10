@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fullstack-pw/cks-terminal-mgmt/internal/config"
-	"github.com/fullstack-pw/cks-terminal-mgmt/internal/terminal"
+	"github.com/homelabz-eu/cks-terminal-mgmt/internal/config"
+	"github.com/homelabz-eu/cks-terminal-mgmt/internal/terminal"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

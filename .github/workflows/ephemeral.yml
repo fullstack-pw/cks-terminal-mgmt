@@ -5,9 +5,9 @@ on:
     types: [opened, synchronize, reopened, closed]
 
 env:
-  REGISTRY: registry.toolz.fullstack.pw
+  REGISTRY: registry.toolz.homelabz.eu
   IMAGE_NAME: library/cks-terminal-mgmt
-  VAULT_ADDR: https://vault.toolz.fullstack.pw
+  VAULT_ADDR: https://vault.toolz.homelabz.eu
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
         id: cluster-info
         run: |
           CLUSTER_NAME="pr-${{ github.event.repository.name }}-${{ github.event.pull_request.number }}"
-          DNS_NAME="pr-${{ github.event.pull_request.number }}-${{ github.event.repository.name }}.ephemeral.fullstack.pw"
+          DNS_NAME="pr-${{ github.event.pull_request.number }}-${{ github.event.repository.name }}.ephemeral.homelabz.eu"
           echo "cluster_name=$CLUSTER_NAME" >> $GITHUB_OUTPUT
           echo "dns_name=$DNS_NAME" >> $GITHUB_OUTPUT
 
@@ -36,7 +36,7 @@ jobs:
       - name: Checkout infra repo
         uses: actions/checkout@v4
         with:
-          repository: fullstack-pw/infra
+          repository: homelabz-eu/infra
           token: ${{ secrets.RUNNER }}
           path: infra
 
@@ -179,7 +179,7 @@ jobs:
 
           kubectl kustomize kustomize/overlays/ephemeral \
             | sed "s|${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-will-be-replaced|${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}|" \
-            | sed "s|dev.terminal.cks.fullstack.pw|${DNS_NAME}|g" \
+            | sed "s|dev.terminal.cks.homelabz.eu|${DNS_NAME}|g" \
             | kubectl apply -f -
 
           kubectl rollout status deployment/cks-terminal-mgmt \
@@ -260,7 +260,7 @@ jobs:
       - name: Checkout demo-apps repository
         uses: actions/checkout@v4
         with:
-          repository: fullstack-pw/demo-apps
+          repository: homelabz-eu/demo-apps
           path: .
 
       - name: Run Cypress tests

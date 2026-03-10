@@ -5,7 +5,7 @@ resources:
   - ../../ephemeral-base
 
 images:
-  - name: registry.toolz.fullstack.pw/library/cks-terminal-mgmt
+  - name: registry.toolz.homelabz.eu/library/cks-terminal-mgmt
     newTag: 688de85fd7b460cfabd665d09ce9c8a5c4759411
 
 patches:
@@ -15,13 +15,13 @@ patches:
     patch: |-
       - op: replace
         path: /spec/rules/0/host
-        value: terminal.cks.fullstack.pw
+        value: terminal.cks.homelabz.eu
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: terminal.cks.fullstack.pw
+        value: terminal.cks.homelabz.eu
       - op: replace
         path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
-        value: terminal.cks.fullstack.pw
+        value: terminal.cks.homelabz.eu
 
 configMapGenerator:
   - name: cks-terminal-mgmt-config
